@@ -47,14 +47,12 @@ class Gamescene extends Phaser.Scene {
         this.throwKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 
         // Collision detection
-        this.physics.add.overlap(this.balls, this.player1, this.pickUpBall, null, this);
-        this.physics.add.overlap(this.balls, this.player2, this.pickUpBall, null, this);
-        this.physics.add.collider(this.balls, this.player1, this.hitPlayer, null, this);
-        this.physics.add.collider(this.balls, this.player2, this.hitPlayer, null, this);
+        this.physics.add.overlap(this.balls, this.player1, this.checkOverlap, null, this);
+        this.physics.add.overlap(this.balls, this.player2, this.checkOverlap, null, this);
 
         // Score display
         this.scoreText1 = this.add.text(16, 16, 'Player 1: 0', { fontSize: '32px', fill: '#FFF' });
-        this.scoreText2 = this.add.text(750, 16, 'Player 2: 0', { fontSize: '32px', fill: '#FFF' });
+        this.scoreText2 = this.add.text(820, 16, 'Player 2: 0', { fontSize: '32px', fill: '#FFF' });
 
         this.player1.hasBall = false;
         this.player2.hasBall = false;
@@ -100,17 +98,22 @@ class Gamescene extends Phaser.Scene {
         }
     }
 
-    pickUpBall(player, ball) {
+    checkOverlap(player, ball) {
         if ((player === this.player1 && Phaser.Input.Keyboard.JustDown(this.pickupKey1)) || 
             (player === this.player2 && Phaser.Input.Keyboard.JustDown(this.pickupKey2))) {
-            if (!player.hasBall) {
-                ball.setVelocity(0, 0);
-                ball.x = player.x;
-                ball.y = player.y;
-                player.hasBall = true;
-                player.ball = ball;
-                ball.setVisible(false); // Hide the ball until it is thrown
-            }
+            this.pickUpBall(player, ball);
+        }
+    }
+
+    pickUpBall(player, ball) {
+        if (!player.hasBall) {
+            ball.setVelocity(0, 0);
+            ball.body.moves = false; // Ensure the ball doesn't move
+            ball.x = player.x;
+            ball.y = player.y;
+            player.hasBall = true;
+            player.ball = ball;
+            ball.setVisible(false); // Hide the ball until it is thrown
         }
     }
 
@@ -129,6 +132,7 @@ class Gamescene extends Phaser.Scene {
             ball.setVelocity(-velocity, 0);
         }
 
+        ball.body.moves = true; // Allow the ball to move again
         ball.setVisible(true); // Show the ball when it is thrown
         ball.thrownBy = player;
         player.hasBall = false;
@@ -138,6 +142,7 @@ class Gamescene extends Phaser.Scene {
     hitPlayer(ball, player) {
         if (ball.thrownBy && ball.thrownBy !== player) {
             ball.setVelocity(0, 0);
+            ball.body.moves = false; // Ensure the ball doesn't move
 
             if (ball.thrownBy === this.player1) {
                 this.player1Score += 1;
