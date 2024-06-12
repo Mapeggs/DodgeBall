@@ -87,7 +87,7 @@ class Gamescene extends Phaser.Scene {
         if (this.player2.hasBall) {
           this.player2.ball.setPosition(this.player2.x, this.player2.y)
         }
-    }
+     }
 
     handleMovement(player, controls, throwKey, spriteKey) {
         if (controls.left.isDown) {
