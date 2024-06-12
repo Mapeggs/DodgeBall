@@ -29,10 +29,14 @@ class Gamescene extends Phaser.Scene {
 
         // Ball physics
         this.balls.children.iterate((ball) => {
-            ball.setCollideWorldBounds(true);
-            ball.setBounce(0, 0); // No bounce
-            ball.setVelocity(0, 0);
-        });
+            ball.setCollideWorldBounds(true)
+            ball.setBounce(0, 0) // No bounce
+            ball.setVelocity(0, 0)
+            ball.body.moves = false // Disable physics initially
+            ball.heldBy = null // No player is holding it
+          })
+          
+  
 
         // Player physics
         this.player1.setCollideWorldBounds(true);
@@ -54,6 +58,11 @@ class Gamescene extends Phaser.Scene {
         this.physics.add.overlap(this.balls, this.player1, this.checkOverlap, null, this);
         this.physics.add.overlap(this.balls, this.player2, this.checkOverlap, null, this);
 
+        // Ball collision with players
+        this.physics.add.collider(this.balls, this.player1, (ball, player) => this.hitPlayer(ball, player));
+        this.physics.add.collider(this.balls, this.player2, (ball, player) => this.hitPlayer(ball, player));
+
+
         // Score display
         this.scoreText1 = this.add.text(16, 16, 'Player 1: 0', { fontSize: '32px', fill: '#FFF' });
         this.scoreText2 = this.add.text(750, 16, 'Player 2: 0', { fontSize: '32px', fill: '#FFF' });
@@ -64,12 +73,20 @@ class Gamescene extends Phaser.Scene {
 
     update() {
         if (this.gameOver) {
-            return;
+          return
         }
-
+      
         // Player 1 & 2 movement
-        this.handleMovement(this.player1, this.WASD, this.throwKey1, 'char1');
-        this.handleMovement(this.player2, this.cursors, this.throwKey2, 'char2');
+        this.handleMovement(this.player1, this.WASD, this.throwKey1, 'char1')
+        this.handleMovement(this.player2, this.cursors, this.throwKey2, 'char2')
+      
+        // Update ball position while held
+        if (this.player1.hasBall) {
+          this.player1.ball.setPosition(this.player1.x, this.player1.y)
+        }
+        if (this.player2.hasBall) {
+          this.player2.ball.setPosition(this.player2.x, this.player2.y)
+        }
     }
 
     handleMovement(player, controls, throwKey, spriteKey) {
@@ -111,60 +128,66 @@ class Gamescene extends Phaser.Scene {
 
     pickUpBall(player, ball) {
         if (!player.hasBall) {
-            ball.setVelocity(0, 0);
-            ball.body.moves = false; // Ensure the ball doesn't move
-            ball.x = player.x;
-            ball.y = player.y;
-            player.hasBall = true;
-            player.ball = ball;
-            ball.setVisible(false); // Hide the ball until it is thrown
+          ball.setVelocity(0, 0)
+          ball.body.moves = false // Disable ball physics
+          ball.heldBy = player // Mark ball as held by the player
+          player.hasBall = true
+          player.ball = ball
+          ball.setVisible(false) // Hide the ball until it is thrown
         }
-    }
+      }
+      
+      
 
-    throwBall(player) {
-        let velocity = 400;
-        let angle = player.angle;
-        let ball = player.ball;
-
+      throwBall(player) {
+        let velocity = 400
+        let angle = player.angle
+        let ball = player.ball
+      
         if (angle === 0) {
-            ball.setVelocity(0, -velocity);
+          ball.setVelocity(0, -velocity)
         } else if (angle === 90) {
-            ball.setVelocity(velocity, 0);
+          ball.setVelocity(velocity, 0)
         } else if (angle === 180) {
-            ball.setVelocity(0, velocity);
+          ball.setVelocity(0, velocity)
         } else if (angle === -90) {
-            ball.setVelocity(-velocity, 0);
+          ball.setVelocity(-velocity, 0)
         }
-
-        ball.body.moves = true; // Allow the ball to move again
-        ball.setVisible(true); // Show the ball when it is thrown
-        ball.thrownBy = player;
-        player.hasBall = false;
-        player.ball = null;
-    }
+      
+        ball.body.moves = true // Enable ball physics
+        ball.setVisible(true) // Show the ball when it is thrown
+        ball.thrownBy = player
+        player.hasBall = false
+        player.ball = null
+      
+        // Add collision detection for the thrown ball
+        this.physics.add.collider(ball, this.player1, (b, p) => this.hitPlayer(b, p))
+        this.physics.add.collider(ball, this.player2, (b, p) => this.hitPlayer(b, p))
+      }
+      
 
     hitPlayer(ball, player) {
         if (ball.thrownBy && ball.thrownBy !== player) {
-            ball.setVelocity(0, 0);
-            ball.body.moves = false; // Ensure the ball doesn't move
-
-            if (ball.thrownBy === this.player1) {
-                this.player1Score += 1;
-                this.scoreText1.setText('Player 1: ' + this.player1Score);
-            } else if (ball.thrownBy === this.player2) {
-                this.player2Score += 1;
-                this.scoreText2.setText('Player 2: ' + this.player2Score);
-            }
-
-            ball.thrownBy = null; // Reset the thrower
-            ball.setPosition(490, 400); // Reset ball position
-
-            if (this.player1Score === 3 || this.player2Score === 3) {
-                this.gameOver = true;
-                this.endGame(ball.thrownBy);
-            }
+          ball.setVelocity(0, 0);
+          ball.body.moves = false; // Ensure the ball doesn't move
+      
+          if (ball.thrownBy === this.player1) {
+            this.player1Score += 1;
+            this.scoreText1.setText('Player 1: ' + this.player1Score);
+          } else if (ball.thrownBy === this.player2) {
+            this.player2Score += 1;
+            this.scoreText2.setText('Player 2: ' + this.player2Score);
+          }
+      
+          player.setVisible(false); // "Destroy" the player (make invisible)
+          ball.thrownBy = null; // Reset the thrower
+          ball.setPosition(490, 400); // Reset ball position
+      
+          this.gameOver = true;
+          this.endGame(ball.thrownBy);
         }
-    }
+      }
+      
 
     endGame(winningPlayer) {
         let winnerText = winningPlayer === this.player1 ? 'Player 1 Wins!' : 'Player 2 Wins!';
