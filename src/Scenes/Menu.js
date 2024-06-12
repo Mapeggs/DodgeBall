@@ -5,7 +5,7 @@ class Menu extends Phaser.Scene {
 
 
     create() {
-        this.background = this.add.image(240, 160, 'Menubackground').setScale(2.5);
+        this.background = this.add.image(240, 160, 'menubackground').setScale(2.5);
         let menuConfig = {
             fontFamily: 'Pixelify Sans',
             fontSize: '100px',
@@ -24,7 +24,7 @@ class Menu extends Phaser.Scene {
         menuConfig.fontSize=75;
 
         // Add the  play button
-        this.playButton = this.add.image(500, 400, "Greybutton").setScale(2.5).setInteractive();
+        this.playButton = this.add.image(500, 400, "greyButton").setScale(2.5).setInteractive();
 
         this.add.text(420, 365, "PLAY", menuConfig);
 
@@ -32,16 +32,6 @@ class Menu extends Phaser.Scene {
         
         this.playButton.on('pointerdown', () => {
             this.scene.start('gameScene')  // Replace 'gameScene' with the key of your main game scene
-          })
-
-
-        //HOVER TINT BROKEN WILL FIX NEVER  
-        this.playButton.on('pointerover', () => {
-            this.playButton.setTint(0x808080)  // Change tint color on hover
-        })
-    
-        this.playButton.on('pointerout', () => {
-            this.playButton.clearTint()  // Reset tint when not hovering
           })
       
 
