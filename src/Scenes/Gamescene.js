@@ -10,7 +10,7 @@ class Gamescene extends Phaser.Scene {
     }
 
     create() {
-        this.cameras.main.setBackgroundColor('#000000');
+        this.background = this.add.image(240, 160, 'menubackground').setScale(2.5);
 
         // Court lines
         this.add.line(0, 0, 490, 0, 490, 800, 0xffffff).setOrigin(0, 0); // Middle line
@@ -41,10 +41,14 @@ class Gamescene extends Phaser.Scene {
         // Player controls
         this.cursors = this.input.keyboard.createCursorKeys();
         this.WASD = this.input.keyboard.addKeys({up: 'W', down: 'S', left: 'A', right: 'D'});
+
+        //player 1 pick-up E and throw SPACE
         this.pickupKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.throwKey1 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.pickupKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CONTROL);
-        this.throwKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+
+        //Player 2 pick-up K and throw L
+        this.pickupKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+        this.throwKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L);
 
         // Collision detection
         this.physics.add.overlap(this.balls, this.player1, this.checkOverlap, null, this);
@@ -52,7 +56,7 @@ class Gamescene extends Phaser.Scene {
 
         // Score display
         this.scoreText1 = this.add.text(16, 16, 'Player 1: 0', { fontSize: '32px', fill: '#FFF' });
-        this.scoreText2 = this.add.text(820, 16, 'Player 2: 0', { fontSize: '32px', fill: '#FFF' });
+        this.scoreText2 = this.add.text(750, 16, 'Player 2: 0', { fontSize: '32px', fill: '#FFF' });
 
         this.player1.hasBall = false;
         this.player2.hasBall = false;
@@ -63,7 +67,7 @@ class Gamescene extends Phaser.Scene {
             return;
         }
 
-        // Player 1 movement
+        // Player 1 & 2 movement
         this.handleMovement(this.player1, this.WASD, this.throwKey1, 'char1');
         this.handleMovement(this.player2, this.cursors, this.throwKey2, 'char2');
     }
