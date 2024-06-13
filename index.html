@@ -4,13 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dodge</title>
-    <script src="./lib/phaser.js"></script>
-    <script src="./src/Scenes/Load.js"></script>
-    <script src="./src/Scenes/Game.js"></script>
-    <script src="./src/Scenes/Menu.js"></script>
-    <script src="./src/main.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+
 </head>
 <body>
+    <script>
+        WebFont.load({
+            google: {
+                families: ['Pixelify Sans:400']
+            }
+        });
+    </script>
+    
+    <script src="./lib/phaser.js"></script>
+    <script src="./src/Scenes/Load.js"></script>
+    <script src="./src/Scenes/Gamescene.js"></script>
+    <script src="./src/Scenes/Menu.js"></script>
+    <script src="./src/main.js"></script>
+
     <div id="phaser-game"></div>
     <span id="description"></span>
 </body>

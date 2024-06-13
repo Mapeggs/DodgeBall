@@ -12,6 +12,11 @@ class Gamescene extends Phaser.Scene {
 
   create() {
     this.background = this.add.image(240, 160, 'menubackground').setScale(2.5);
+    this.backgroundMusic = this.sound.add('sfxbackground_music', { loop: true })
+    this.backgroundMusic.play()
+  
+    // Set initial volume
+    this.backgroundMusic.setVolume(0.3)
 
     // Court lines
     this.add.line(0, 0, 490, 0, 490, 800, 0xffffff).setOrigin(0, 0); // Middle line
@@ -119,7 +124,7 @@ class Gamescene extends Phaser.Scene {
 
       // Player throws ball
       if (Phaser.Input.Keyboard.JustDown(throwKey) && player.hasBall) {
-          this.sound.play('sfxthrow_ball');
+          this.sound.play('sfxthrow_ball',{ volume: 3.0 });
           this.throwBall(player);
       }
   }
@@ -190,6 +195,7 @@ class Gamescene extends Phaser.Scene {
 
   hitPlayer(ball, player) {
     if (ball.thrownBy && ball.thrownBy !== player) {
+      this.sound.play('sfxplayer_death');
       ball.setVelocity(0, 0)
       ball.body.moves = false // Ensure the ball doesn't move
   

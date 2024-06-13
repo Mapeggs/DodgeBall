@@ -16,9 +16,9 @@ class Load extends Phaser.Scene {
         this.load.image('ball', 'ball.png');
 
         //Load audio assets
-        this.load.audio('sfxplayer_death','player_death.ogg');
-        this.load.audio('sfxthrow_ball','throwball.ogg');
-        this.laod.audio('sfxbackground_music','backgroundmusic.ogg');
+        this.load.audio('sfxplayer_death', 'player_death.ogg');
+        this.load.audio('sfxthrow_ball', 'throwball.ogg');
+        this.load.audio('sfxbackground_music', 'backgroundmusic.ogg');
     }
 
     create() {
