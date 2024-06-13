@@ -28,8 +28,7 @@ class Gamescene extends Phaser.Scene {
     // Load balls
     this.balls = this.physics.add.group({
         key: 'ball',
-        repeat: 2,
-        setXY: { x: 490, y: 300, stepX: 0, stepY: 200 }
+        setXY: { x: 490, y:400, stepX: 0, stepY: 0 }
     });
 
     // Ball physics
@@ -215,7 +214,7 @@ resetRound() {
 
   // Reset ball positions
   this.balls.children.iterate((ball) => {
-    ball.setPosition(490, 300)
+    ball.setPosition(490, 400)
     ball.setVelocity(0, 0)
     ball.body.moves = false
     ball.heldBy = null
