@@ -63,9 +63,6 @@ class Gamescene extends Phaser.Scene {
     this.physics.add.overlap(this.balls, this.player1, this.checkOverlap, null, this);
     this.physics.add.overlap(this.balls, this.player2, this.checkOverlap, null, this);
 
-// Commented out ball collision with players to prevent unwanted ball movement
-// this.physics.add.collider(this.balls, this.player1, (ball, player) => this.hitPlayer(ball, player));
-// this.physics.add.collider(this.balls, this.player2, (ball, player) => this.hitPlayer(ball, player));
 
 
     // Score display
@@ -75,7 +72,7 @@ class Gamescene extends Phaser.Scene {
     this.player1.hasBall = false;
     this.player2.hasBall = false;
 
-    this.physics.world.on('worldbounds', this.increaseBallSpeed, this)
+    this.physics.world.on('worldbounds', this.increaseBallSpeed, this);
 }
 
   update() {
@@ -165,29 +162,27 @@ class Gamescene extends Phaser.Scene {
           let velocityY = velocity * Math.sin(angle);
   
           ball.setVelocity(velocityX, velocityY);
+
+          // Handle world bounds to deactivate the ball when it goes out of bounds
+          ball.body.setCollideWorldBounds(true);
+          ball.body.onWorldBounds = true;          
   
           // Add collision detection for the thrown ball
           this.physics.add.collider(ball, this.player1, (b, p) => this.hitPlayer(b, p));
           this.physics.add.collider(ball, this.player2, (b, p) => this.hitPlayer(b, p));
   
-          // Handle world bounds to deactivate the ball when it goes out of bounds
-          ball.body.setCollideWorldBounds(true);
-          ball.body.onWorldBounds = true;
-          //ball.body.world.on('worldbounds', () => {
-              //ball.setActive(false);
-              //ball.setVisible(false);
-          //});
-      }
-  }
 
-  increaseBallSpeed(body) {
-    let ball = body.gameObject
-    if (ball && ball.worldBounceCount !== undefined) {
-      // Increase ball velocity by a factor (e.g., 10%)
-      ball.setVelocity(ball.body.velocity.x * 1.1, ball.body.velocity.y * 1.1)
-      ball.worldBounceCount += 1
+        }
     }
-  }
+
+    increaseBallSpeed(body) {
+      let ball = body.gameObject;
+      if (ball && ball.worldBounceCount !== undefined) {
+        // Increase ball velocity by a factor (e.g., 10%)
+        ball.setVelocity(ball.body.velocity.x * 1.1, ball.body.velocity.y * 1.1);
+        ball.worldBounceCount += 1;
+      }
+    }
   
   
     
@@ -231,6 +226,7 @@ resetRound() {
     ball.setVelocity(0, 0)
     ball.body.moves = false
     ball.heldBy = null
+    ball.setBounce(1, 1); // Ensure bounce is reset
     ball.worldBounceCount = 0 // Reset bounce count
   })
 
