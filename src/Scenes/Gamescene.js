@@ -34,13 +34,14 @@ class Gamescene extends Phaser.Scene {
 
     // Ball physics
     this.balls.children.iterate((ball) => {
-        ball.setCollideWorldBounds(true)
-        ball.setBounce(0, 0) // No bounce
-        ball.setVelocity(0, 0)
-        ball.body.moves = false // Disable physics initially
-        ball.heldBy = null // No player is holding it
+        ball.setCollideWorldBounds(true);
+        ball.setBounce(0, 0); // No bounce
+        ball.setVelocity(0, 0);
+        ball.body.moves = false; // Disable physics initially
+        ball.heldBy = null; // No player is holding it
     });
-
+    
+    
     // Player physics
     this.player1.setCollideWorldBounds(true);
     this.player2.setCollideWorldBounds(true);
@@ -57,13 +58,14 @@ class Gamescene extends Phaser.Scene {
     this.pickupKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
     this.throwKey2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L);
 
-    // Collision detection
+    // Use overlap instead of collider to manage ball pick up
     this.physics.add.overlap(this.balls, this.player1, this.checkOverlap, null, this);
     this.physics.add.overlap(this.balls, this.player2, this.checkOverlap, null, this);
 
-    // Ball collision with players
-    this.physics.add.collider(this.balls, this.player1, (ball, player) => this.hitPlayer(ball, player));
-    this.physics.add.collider(this.balls, this.player2, (ball, player) => this.hitPlayer(ball, player));
+// Commented out ball collision with players to prevent unwanted ball movement
+// this.physics.add.collider(this.balls, this.player1, (ball, player) => this.hitPlayer(ball, player));
+// this.physics.add.collider(this.balls, this.player2, (ball, player) => this.hitPlayer(ball, player));
+
 
     // Score display
     this.scoreText1 = this.add.text(16, 16, 'Player 1: ' + this.player1Score, { fontSize: '32px', fill: '#FFF' })
@@ -206,26 +208,26 @@ class Gamescene extends Phaser.Scene {
     }
   }
   
-  resetRound() {
-    // Reset player positions
-    this.player1.setPosition(200, 400).setVisible(true)
-    this.player2.setPosition(780, 400).setVisible(true)
-  
-    // Reset ball positions
-    this.balls.children.iterate((ball) => {
-      ball.setPosition(490, 300)
-      ball.setVelocity(0, 0)
-      ball.body.moves = false
-      ball.heldBy = null
-    })
-  
-    // Ensure players are not holding any balls
-    this.player1.hasBall = false
-    this.player2.hasBall = false
-  }  
+resetRound() {
+  // Reset player positions
+  this.player1.setPosition(200, 400).setVisible(true)
+  this.player2.setPosition(780, 400).setVisible(true)
+
+  // Reset ball positions
+  this.balls.children.iterate((ball) => {
+    ball.setPosition(490, 300)
+    ball.setVelocity(0, 0)
+    ball.body.moves = false
+    ball.heldBy = null
+  })
+
+  // Ensure players are not holding any balls
+  this.player1.hasBall = false
+  this.player2.hasBall = false
+}  
     
 
-  endGame() {
+endGame() {
     let winnerText = this.player1Score >= this.scoreLimit ? 'Player 1 Wins!' : 'Player 2 Wins!'
     this.add.text(490, 400, winnerText, { fontSize: '64px', fill: '#FFF' }).setOrigin(0.5, 0.5)
   
@@ -239,6 +241,5 @@ class Gamescene extends Phaser.Scene {
       this.scene.restart()
     })
   }
-  
   
 }
