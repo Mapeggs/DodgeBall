@@ -39,7 +39,7 @@ class Gamescene extends Phaser.Scene {
     // Ball physics
     this.balls.children.iterate((ball) => {
       ball.setCollideWorldBounds(true);
-      ball.setBounce(1, 1); // Full bounce
+      ball.setBounce(0, 0); 
       ball.setVelocity(0, 0);
       ball.body.moves = false; // Disable physics initially
       ball.heldBy = null; // No player is holding it
