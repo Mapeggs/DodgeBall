@@ -33,11 +33,13 @@ class Gamescene extends Phaser.Scene {
 
     // Ball physics
     this.balls.children.iterate((ball) => {
-        ball.setCollideWorldBounds(true);
-        ball.setBounce(0, 0); // No bounce
-        ball.setVelocity(0, 0);
-        ball.body.moves = false; // Disable physics initially
-        ball.heldBy = null; // No player is holding it
+      ball.setCollideWorldBounds(true);
+      ball.setBounce(1, 1); // Full bounce
+      ball.setVelocity(0, 0);
+      ball.body.moves = false; // Disable physics initially
+      ball.heldBy = null; // No player is holding it
+      ball.body.onWorldBounds = true; // Enable world bounds event
+      ball.worldBounceCount = 0; // Track number of bounces
     });
     
     
@@ -72,6 +74,8 @@ class Gamescene extends Phaser.Scene {
 
     this.player1.hasBall = false;
     this.player2.hasBall = false;
+
+    this.physics.world.on('worldbounds', this.increaseBallSpeed, this)
 }
 
   update() {
@@ -169,11 +173,20 @@ class Gamescene extends Phaser.Scene {
           // Handle world bounds to deactivate the ball when it goes out of bounds
           ball.body.setCollideWorldBounds(true);
           ball.body.onWorldBounds = true;
-          ball.body.world.on('worldbounds', () => {
-              ball.setActive(false);
-              ball.setVisible(false);
-          });
+          //ball.body.world.on('worldbounds', () => {
+              //ball.setActive(false);
+              //ball.setVisible(false);
+          //});
       }
+  }
+
+  increaseBallSpeed(body) {
+    let ball = body.gameObject
+    if (ball && ball.worldBounceCount !== undefined) {
+      // Increase ball velocity by a factor (e.g., 10%)
+      ball.setVelocity(ball.body.velocity.x * 1.1, ball.body.velocity.y * 1.1)
+      ball.worldBounceCount += 1
+    }
   }
   
   
@@ -218,6 +231,7 @@ resetRound() {
     ball.setVelocity(0, 0)
     ball.body.moves = false
     ball.heldBy = null
+    ball.worldBounceCount = 0 // Reset bounce count
   })
 
   // Ensure players are not holding any balls
