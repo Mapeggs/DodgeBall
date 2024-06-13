@@ -4,9 +4,10 @@ class Gamescene extends Phaser.Scene {
   }
 
   init() {
-      this.player1Score = 0;
-      this.player2Score = 0;
-      this.gameOver = false;
+    this.player1Score = 0
+    this.player2Score = 0
+    this.gameOver = false
+    this.scoreLimit = 3 // The winning score
   }
 
   create() {
@@ -65,8 +66,8 @@ class Gamescene extends Phaser.Scene {
     this.physics.add.collider(this.balls, this.player2, (ball, player) => this.hitPlayer(ball, player));
 
     // Score display
-    this.scoreText1 = this.add.text(16, 16, 'Player 1: 0', { fontSize: '32px', fill: '#FFF' });
-    this.scoreText2 = this.add.text(750, 16, 'Player 2: 0', { fontSize: '32px', fill: '#FFF' });
+    this.scoreText1 = this.add.text(16, 16, 'Player 1: ' + this.player1Score, { fontSize: '32px', fill: '#FFF' })
+    this.scoreText2 = this.add.text(750, 16, 'Player 2: ' + this.player2Score, { fontSize: '32px', fill: '#FFF' })
 
     this.player1.hasBall = false;
     this.player2.hasBall = false;
@@ -178,34 +179,66 @@ class Gamescene extends Phaser.Scene {
     
 
   hitPlayer(ball, player) {
-      if (ball.thrownBy && ball.thrownBy !== player) {
-        ball.setVelocity(0, 0);
-        ball.body.moves = false; // Ensure the ball doesn't move
-    
-        if (ball.thrownBy === this.player1) {
-          this.player1Score += 1;
-          this.scoreText1.setText('Player 1: ' + this.player1Score);
-        } else if (ball.thrownBy === this.player2) {
-          this.player2Score += 1;
-          this.scoreText2.setText('Player 2: ' + this.player2Score);
-        }
-    
-        player.setVisible(false); // "Destroy" the player (make invisible)
-        ball.thrownBy = null; // Reset the thrower
-        ball.setPosition(490, 400); // Reset ball position
-    
-        this.gameOver = true;
-        this.endGame(ball.thrownBy);
+    if (ball.thrownBy && ball.thrownBy !== player) {
+      ball.setVelocity(0, 0)
+      ball.body.moves = false // Ensure the ball doesn't move
+  
+      if (ball.thrownBy === this.player1) {
+        this.player1Score += 1
+        this.scoreText1.setText('Player 1: ' + this.player1Score)
+      } else if (ball.thrownBy === this.player2) {
+        this.player2Score += 1
+        this.scoreText2.setText('Player 2: ' + this.player2Score)
+      }
+  
+      player.setVisible(false) // "Destroy" the player (make invisible)
+      ball.thrownBy = null // Reset the thrower
+      ball.setPosition(490, 400) // Reset ball position
+  
+      // Check if a player has won
+      if (this.player1Score >= this.scoreLimit || this.player2Score >= this.scoreLimit) {
+        this.gameOver = true
+        this.endGame()
+      } else {
+        // Reset player positions and ball for the next round
+        this.resetRound()
       }
     }
+  }
+  
+  resetRound() {
+    // Reset player positions
+    this.player1.setPosition(200, 400).setVisible(true)
+    this.player2.setPosition(780, 400).setVisible(true)
+  
+    // Reset ball positions
+    this.balls.children.iterate((ball) => {
+      ball.setPosition(490, 300)
+      ball.setVelocity(0, 0)
+      ball.body.moves = false
+      ball.heldBy = null
+    })
+  
+    // Ensure players are not holding any balls
+    this.player1.hasBall = false
+    this.player2.hasBall = false
+  }  
     
 
-  endGame(winningPlayer) {
-      let winnerText = winningPlayer === this.player1 ? 'Player 1 Wins!' : 'Player 2 Wins!';
-      this.add.text(490, 400, winnerText, { fontSize: '64px', fill: '#FFF' }).setOrigin(0.5, 0.5);
-
-      this.input.keyboard.on('keydown', () => {
-          this.scene.restart();
-      });
+  endGame() {
+    let winnerText = this.player1Score >= this.scoreLimit ? 'Player 1 Wins!' : 'Player 2 Wins!'
+    this.add.text(490, 400, winnerText, { fontSize: '64px', fill: '#FFF' }).setOrigin(0.5, 0.5)
+  
+    // Add a prompt to press SPACE to restart
+    this.add.text(490, 480, 'Press SPACE to Restart', { fontSize: '32px', fill: '#FFF' }).setOrigin(0.5, 0.5)
+  
+    // Listen for the SPACE key to restart the game
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
+  
+    this.spaceKey.on('down', () => {
+      this.scene.restart()
+    })
   }
+  
+  
 }
