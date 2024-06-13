@@ -119,6 +119,7 @@ class Gamescene extends Phaser.Scene {
 
       // Player throws ball
       if (Phaser.Input.Keyboard.JustDown(throwKey) && player.hasBall) {
+          this.sound.play('sfxthrow_ball');
           this.throwBall(player);
       }
   }
